@@ -7,13 +7,20 @@
 
 import UIKit
 
-class Anasayfa: UIViewController {
+class Anasayfa: UIViewController,UISearchBarDelegate {
 
+    
+    @IBOutlet weak var seacrhBar: UISearchBar!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        seacrhBar.delegate = self
+        
+        
     }
-
+    
+    
     @IBAction func detay(_ sender: Any) {
         let kisi = Kisiler(kisi_id:1, kisi_ad: "merve",kisi_tel: "0876534")
         performSegue(withIdentifier: "toDetay", sender: kisi)
@@ -28,6 +35,10 @@ class Anasayfa: UIViewController {
             }
             
         }
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        print("kişi arama: \(searchText)")
     }
     
 }
