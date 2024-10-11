@@ -14,6 +14,8 @@ class AnasayfaViewModel{
     var kisileriListesi = BehaviorSubject<[Kisiler]>(value: [Kisiler]())
     
     init(){
+
+        veritabanikopyala()
         kisileriListesi=krepo.kisileriListesi
         kisileriiyukle()
     }
@@ -27,5 +29,23 @@ class AnasayfaViewModel{
     
     func kisileriiyukle(){
         krepo.kisileriyukle()
+    }
+    
+    func veritabanikopyala(){//ezbere bişi kopyalama için veri tabanından
+        let bundleyolu = Bundle.main.path(forResource: "rehber", ofType: ".sqlite")
+        let hedefYol = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
+        let kopyalanacakyer = URL(fileURLWithPath:hedefYol).appendingPathComponent("rehber.sqlite")
+        let fileManager=FileManager.default
+        if fileManager.fileExists(atPath: kopyalanacakyer.path)
+        {
+            print("zaten veritabanı var")
+        }else{
+                do{
+                    try fileManager.copyItem(atPath: bundleyolu!, toPath: kopyalanacakyer.path)
+                }catch{
+                    
+                }
+            }
+        
     }
 }

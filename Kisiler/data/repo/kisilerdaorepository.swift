@@ -11,6 +11,13 @@ import RxSwift
 class kisilerDaoRepositry {
     
     var kisileriListesi = BehaviorSubject<[Kisiler]>(value: [Kisiler]())
+    let db: FMDatabase?
+    
+    init(){
+        let hedefYol = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
+        let veritabaniurl = URL(fileURLWithPath:hedefYol).appendingPathComponent("rehber.sqlite")
+        db = FMDatabase(path: veritabaniurl.path)
+    }
     
     func kaydet(kisi_ad:String,kisi_tel:String){
         
@@ -35,12 +42,31 @@ class kisilerDaoRepositry {
     
     func kisileriyukle(){
         print("kisileri yukle")
-        var kisilerListesi=[Kisiler]()
-        let k1 = Kisiler(kisi_id:1, kisi_ad:"Mürşide",  kisi_tel: "12345")
-        let k3 = Kisiler(kisi_id: 2, kisi_ad: "mustafa", kisi_tel: "345768")
-        kisilerListesi.append(k1)
-        kisilerListesi.append(k3)
-        kisileriListesi.onNext(kisilerListesi)
+       
+        //kisileriListesi.onNext(kisilerListesi)
+        
+        db?.open()
+        var liste = [Kisiler]()
+        
+        do{
+            let rs = try db!.executeQuery("SELECT * FROM kisiler", values: nil)
+            
+            while rs.next(){
+                let kisi = Kisiler(kisi_id: Int(rs.string(forColumn: "kisi_id"))!
+                                   , kisi_ad: rs.string(forColumn: "kisi_ad")!, kisi_tel: rs.string(forColumn: "kisi_tel")!)
+                
+                liste.append(kisi)
+            }
+            kisileriListesi.onNext(liste)
+        }catch {
+            print(error.localizedDescription)
+            
+        }
+
+
+        db?.close()
     }
+    
+    
     
 }
