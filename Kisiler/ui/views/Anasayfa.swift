@@ -14,23 +14,26 @@ class Anasayfa: UIViewController {
     @IBOutlet weak var kisilerTableView: UITableView!
     var kisilerListesi = [Kisiler]()
     
+    var viewmodel=AnasayfaViewModel()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         seacrhBar.delegate = self
-        let k1 = Kisiler(kisi_id:1, kisi_ad:"Mürşide",  kisi_tel: "12345")
-        let k3 = Kisiler(kisi_id: 2, kisi_ad: "mustafa", kisi_tel: "345768")
-        kisilerListesi.append(k1)
-        kisilerListesi.append(k3)
+        
         kisilerTableView.delegate = self
         kisilerTableView.dataSource = self
         //kisilerTableView.reloadData()
         
-        
+    _=viewmodel.kisileriListesi.subscribe(onNext:{liste in self.kisilerListesi=liste
+            
+            self.kisilerTableView.reloadData()
+            
+        })
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        print("anasayfa göründü")
+        viewmodel.kisileriiyukle()
     }
     
     
@@ -52,7 +55,7 @@ class Anasayfa: UIViewController {
 
 extension Anasayfa: UISearchBarDelegate {//sınıfı genişlettik
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        print("kişi arama: \(searchText)")
+        viewmodel.ara(ara_kriter: searchText)
     }
 }
 
@@ -82,13 +85,15 @@ extension Anasayfa: UITableViewDelegate, UITableViewDataSource{
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let sil = UIContextualAction(style: .destructive, title: "Sil") { (contextualAction, sourceView, bool) in
             let kisi = self.kisilerListesi[indexPath.row]
+            
             let alert = UIAlertController(title: "Kişi Silme", message: "\(kisi.kisi_ad!) Kişi Silinsin mi?", preferredStyle: .alert)
+            
             
             let iptal = UIAlertAction(title: "İptal", style: .cancel)
             alert.addAction(iptal)
             
             let sil = UIAlertAction(title: "Sil", style: .destructive) { (action) in
-                print("kişi sil : \(kisi.kisi_id!)")
+                self.viewmodel.kisisil(kisi_id: kisi.kisi_id!)
                 
             }
             alert.addAction(sil)
