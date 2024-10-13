@@ -21,43 +21,17 @@ class kisilerDaoRepositry {
     
     func kaydet(kisi_ad:String,kisi_tel:String){
         
-        print("kisi kaydet: \(kisi_ad) \(kisi_tel)")
-        
-    }
-    
-    func guncelle(kisi_id:Int, kisi_ad:String,kisi_tel:String){
-        
-        print("kisi kaydet: \(kisi_ad) \(kisi_tel)  \(kisi_id)")
-        
-    }
-    
-    func sil(kisi_id:Int){
-       print("kişisil: \(kisi_id)")
-        kisileriyukle()
-    }
-    
-    func ara(aramakelimesi : String){
-        print("kişi ara: \(aramakelimesi) ")
-    }
-    
-    func kisileriyukle(){
         print("kisileri yukle")
        
         //kisileriListesi.onNext(kisilerListesi)
         
         db?.open()
-        var liste = [Kisiler]()
+        
         
         do{
-            let rs = try db!.executeQuery("SELECT * FROM kisiler", values: nil)
+            try db!.executeUpdate("INSERT INTO kisiler (kisi_ad,kisi_tel) VALUES (?,?)", values: [kisi_ad,kisi_tel])
             
-            while rs.next(){
-                let kisi = Kisiler(kisi_id: Int(rs.string(forColumn: "kisi_id"))!
-                                   , kisi_ad: rs.string(forColumn: "kisi_ad")!, kisi_tel: rs.string(forColumn: "kisi_tel")!)
-                
-                liste.append(kisi)
-            }
-            kisileriListesi.onNext(liste)
+            
         }catch {
             print(error.localizedDescription)
             
@@ -66,6 +40,113 @@ class kisilerDaoRepositry {
 
         db?.close()
     }
+    
+    
+    
+        
+    
+    
+    func guncelle(kisi_id:Int, kisi_ad:String,kisi_tel:String){
+        
+        print("kisi kaydet: \(kisi_ad) \(kisi_tel)  \(kisi_id)")
+        
+        db?.open()
+        
+        
+        do{
+            try db!.executeUpdate("UPDATE kisiler SET kisi_ad = ?, kisi_tel = ? WHERE kisi_id = ? ", values: [kisi_ad,kisi_tel,kisi_id])
+            
+            
+        }catch {
+            print(error.localizedDescription)
+            
+        }
+
+
+        db?.close()
+        
+    }
+    
+    func sil(kisi_id:Int){
+        
+       print("kişisil: \(kisi_id)")
+        
+        db?.open()
+        
+        
+        do{
+            try db!.executeUpdate("DELETE FROM kisiler WHERE kisi_id = ? ", values: [kisi_id])
+            kisileriyukle()
+            
+            
+        }catch {
+            print(error.localizedDescription)
+            
+        }
+
+
+        db?.close()
+        
+    }
+        
+    
+    
+    
+    
+    
+    func ara(aramakelimesi : String){
+        print("kişi ara: \(aramakelimesi) ")
+        
+        db?.open()
+        var liste = [Kisiler]()
+        
+        do{
+            let rs = try db!.executeQuery("SELECT * FROM kisiler WHERE kisi_ad LIKE '%\(aramakelimesi)%' ", values: nil)
+            
+            while rs.next(){
+                let kisi = Kisiler(kisi_id: Int(rs.string(forColumn: "kisi_id"))!
+                                   , kisi_ad: rs.string(forColumn: "kisi_ad")!, kisi_tel: rs.string(forColumn: "kisi_tel")!)
+                
+                liste.append(kisi)
+            }
+            kisileriListesi.onNext(liste)//tetikleme
+        }catch {
+            print(error.localizedDescription)
+            
+        }
+
+
+        db?.close()
+    }
+    
+    
+    
+func kisileriyukle(){
+    print("kisileri yukle")
+    
+    //kisileriListesi.onNext(kisilerListesi)
+    
+    db?.open()
+    var liste = [Kisiler]()
+    
+    do{
+        let rs = try db!.executeQuery("SELECT * FROM kisiler", values: nil)
+        
+        while rs.next(){
+            let kisi = Kisiler(kisi_id: Int(rs.string(forColumn: "kisi_id"))!
+                               , kisi_ad: rs.string(forColumn: "kisi_ad")!, kisi_tel: rs.string(forColumn: "kisi_tel")!)
+            
+            liste.append(kisi)
+        }
+        kisileriListesi.onNext(liste)
+    }catch {
+        print(error.localizedDescription)
+        
+    }
+    
+    
+    db?.close()
+}
     
     
     
